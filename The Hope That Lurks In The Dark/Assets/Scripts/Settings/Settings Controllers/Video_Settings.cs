@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Video_Settings : MonoBehaviour
@@ -54,22 +53,22 @@ public class Video_Settings : MonoBehaviour
     //Temporary Settings//
     #region Temporary Settings
     //Screen Mode//
-    public int screenMode_temporary;
+    [HideInInspector]public int screenMode_temporary;
 
     //Resolution//
-    public int resolution_temporary;
+    [HideInInspector] public int resolution_temporary;
 
     //Custom resolution//
-    public bool customResolution_temporary;
-    public int customResolutionHeight_temporary;
-    public int customResolutionWidth_temporary;
+    [HideInInspector] public bool customResolution_temporary;
+    [HideInInspector] public int customResolutionHeight_temporary;
+    [HideInInspector] public int customResolutionWidth_temporary;
 
     //V Sync//
-    public int vSync_temporary;
+    [HideInInspector] public int vSync_temporary;
 
     //FPS Limit//
-    public bool limitFramerate_temporary;
-    public int maxFramerate_temporary;
+    [HideInInspector] public bool limitFramerate_temporary;
+    [HideInInspector] public int maxFramerate_temporary;
 
 
     #endregion Temporary Settings
@@ -77,6 +76,9 @@ public class Video_Settings : MonoBehaviour
     //Resolutions//
     int[] resolutionHeight = { 720, 900, 1080, 1440, 2160 };
     int[] resolutionWidth = { 1280, 1600, 1920, 2560, 3840 };
+
+    //Windowed?//
+    bool fullScreenMode;
 
     #endregion Settings
 
@@ -103,34 +105,57 @@ public class Video_Settings : MonoBehaviour
 
     public void ExecuteVideoSettings() //Executing Video Settings in Engine//
     {
+        
+
+        #region Screen Mode
+        StartCoroutine("SetFullScreenWindowMode");
+
+        //Screen mode// //0 – Exclusive Full Screen, 1 – Full Screen Windowed, 2 – Maximized Window, 3 – Window
+        if (screenMode_actual == 0)
+        {
+            fullScreenMode = true;
+        }
+        else if (screenMode_actual == 1)
+        {
+            //To Set Full Screen Windowed, need Delay//
+            StartCoroutine("SetFullScreenWindowMode"); 
+        }
+        else if (screenMode_actual == 2)
+        {
+            fullScreenMode = false;
+        }
+        else
+        {
+            Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
+            screenMode_actual = screenMode_default;
+        }
+        #endregion Screen Mode
+
+
         #region Resolution
         //Setting Resolution//
         if (customResolution_actual)
         {
-            Screen.SetResolution(customResolutionWidth_actual, customResolutionHeight_actual, true);
+            Screen.SetResolution(customResolutionWidth_actual, customResolutionHeight_actual, fullScreenMode);
         }
         else if (!customResolution_actual)
         {
             if (resolution_actual >= 0 && resolution_actual <= (resolutionHeight.Length - 1))
             {
-                Screen.SetResolution(resolutionWidth[resolution_actual], resolutionHeight[resolution_actual], true);
+                Screen.SetResolution(resolutionWidth[resolution_actual], resolutionHeight[resolution_actual], fullScreenMode);
             }
             else
             {
                 resolution_actual = resolution_default;
-                Screen.SetResolution(resolutionWidth[2], resolutionHeight[2], true);
+                Screen.SetResolution(resolutionWidth[2], resolutionHeight[2], fullScreenMode);
             }
         }
         else //if someone broke config file//
         {
             customResolution_actual = customResolution_default;
-            Screen.SetResolution(resolutionWidth[2], resolutionHeight[2], true);
+            Screen.SetResolution(resolutionWidth[2], resolutionHeight[2], fullScreenMode);
         }
         #endregion Resolution
-
-        #region Screen Mode
-        StartCoroutine("SetScreenMode");
-        #endregion Screen Mode
 
         #region VSync & Framerate Limit
         if (limitFramerate_actual)
@@ -173,32 +198,10 @@ public class Video_Settings : MonoBehaviour
         #endregion VSync & FPS Limiter
     }
 
-    IEnumerator SetScreenMode()
+    IEnumerator SetFullScreenWindowMode()
     {
-        yield return new WaitForSecondsRealtime(0.1f);
-
-        //Screen mode// //0 – Exclusive Full Screen, 1 – Full Screen Windowed, 2 – Maximized Window, 3 – Window
-        if (screenMode_actual == 0)
-        {
-            Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
-        }
-        else if (screenMode_actual == 1)
-        {
-            Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
-        }
-        else if (screenMode_actual == 2)
-        {
-            Screen.fullScreenMode = FullScreenMode.MaximizedWindow;
-        }
-        else if (screenMode_actual == 3)
-        {
-            Screen.fullScreenMode = FullScreenMode.Windowed;
-        }
-        else
-        {
-            Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
-            screenMode_actual = screenMode_default;
-        }
+        yield return new WaitForSecondsRealtime(0.2f);
+        Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
     }
 
 

@@ -53,13 +53,13 @@ public class Audio_Settings : MonoBehaviour
     #region Audio Settings Temporary
     [Header("Temporary Settings")]
     //Mute Sound//
-    public bool muteSound_temporary;
+    [HideInInspector] public bool muteSound_temporary;
 
     //Volumes//
-    [Range(0, 100)] public int masterVolume_temporary;
-    [Range(0, 100)] public int sfxVolume_temporary;
-    [Range(0, 100)] public int musicVolume_temporary;
-    [Range(0, 100)] public int dialoguesVolume_temporary;
+    [HideInInspector] [Range(0, 100)] public int masterVolume_temporary;
+    [HideInInspector] [Range(0, 100)] public int sfxVolume_temporary;
+    [HideInInspector] [Range(0, 100)] public int musicVolume_temporary;
+    [HideInInspector] [Range(0, 100)] public int dialoguesVolume_temporary;
     #endregion Audio Settings Temporary
     public void AudioDefaultValueSet()
     {
