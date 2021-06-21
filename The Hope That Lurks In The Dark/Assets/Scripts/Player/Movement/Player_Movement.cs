@@ -335,18 +335,18 @@ public class Player_Movement : MonoBehaviour
         {
             if (hit.moveDirection.y < -0.3f)
             {
-                force = new Vector3(0, -0.5f, 0) * gravity * (playerMass / 10);
+                return;
             }
             else
             {
-
-                force = new Vector3(hit.moveDirection.x, hit.moveDirection.y, hit.moveDirection.z);
+                force = new Vector3(hit.moveDirection.x, 0.05f, hit.moveDirection.z);
             }
-            body.AddForce(force * playerPushPower);
+            
+            body.velocity = force * playerPushPower;
+
         }
 
     }
-
     #endregion Physic with objects
 
     #endregion Special Functions
