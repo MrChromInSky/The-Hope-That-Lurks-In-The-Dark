@@ -12,7 +12,19 @@ public class Cursor_Controller : MonoBehaviour
 
     private void Start()
     {
-        if(cursorLocked)
+
+#if UNITY_EDITOR
+
+        cursorLocked = false;
+        cursorVisibility = true;
+
+#else
+        cursorLocked = true;
+        cursorVisibility = false;
+
+#endif
+
+        if (cursorLocked)
         {
             Cursor.lockState = CursorLockMode.Locked;
         }
@@ -22,7 +34,7 @@ public class Cursor_Controller : MonoBehaviour
         }
 
 
-        if (cursorVisibility) 
+        if (cursorVisibility)
         {
             Cursor.visible = true;
         }
@@ -30,6 +42,6 @@ public class Cursor_Controller : MonoBehaviour
         {
             Cursor.visible = false;
         }
-        
+
     }
 }

@@ -28,7 +28,7 @@ public class Player_Main : MonoBehaviour
 
     #region Default
     //Default Player States//
-    public enum PlayerDefaultStates { Disabled, Idle, Walking, Running, Jumping, OnAir, Sneaking_Idle, Sneaking_Walk };
+    public enum PlayerDefaultStates { Disabled, Idle, Walking, Running, Jumping, OnAir, OnAir_Falling, Sneaking_Idle, Sneaking_Walk };
     [Header("Default States")]
     public PlayerDefaultStates playerDefaultState;
     #endregion Default

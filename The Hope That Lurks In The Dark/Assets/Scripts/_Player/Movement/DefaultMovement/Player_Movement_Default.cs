@@ -49,9 +49,25 @@ public class Player_Movement_Default : MonoBehaviour
     [SerializeField] float runSpeed;
     [SerializeField] float runAccelerationSpeed;
 
+    [Header("Sneaking")]
+    [SerializeField] float crouchSpeed;
+    [SerializeField] float crouchAccelerationSpeed;
+
+    [Header("On Air")]
+    [SerializeField] float onAirSpeed;
+    [SerializeField] float onAirAccelerationSpeed;
+
     [Header("Factors")]
     [SerializeField] float backwardMovementFactor;
     [SerializeField] float sidewaysMovementFactor;
+
+    [Header("Landing")]
+    [SerializeField] bool isLandedOnGround;
+    [SerializeField] float onGroundVerticalForce;
+    [SerializeField] float groundingSpeed;
+
+    [Header("Gravitation Force")]
+    [SerializeField] float fallingSpeed;
 
     [Header("Player Speed")]
     public float DEBUG_Player_Speed;
@@ -72,7 +88,7 @@ public class Player_Movement_Default : MonoBehaviour
     [SerializeField] Vector2 horizontalMoveVector;
     [SerializeField] Vector2 desiredHorizontalSpeeds;
 
-    [SerializeField] float verticalVelocity;
+    public float verticalVelocity;
 
     [SerializeField] Vector3 moveVector;
     #endregion Movement Values
@@ -108,70 +124,48 @@ public class Player_Movement_Default : MonoBehaviour
     #region Movement Functions
     void MovementController()
     {
-        DEBUG_Player_Speed = playerController.velocity.magnitude;
-        DesiredSpeedOptimization(); //Optimization//
+        DEBUG_Player_Speed = playerController.velocity.magnitude; //Debug player speed//
 
+        //State Execution Controller//
         switch (player_Main.playerDefaultState)
         {
-            case Player_Main.PlayerDefaultStates.Sneaking_Idle:
-            case Player_Main.PlayerDefaultStates.Sneaking_Walk:
-                Movement_Walk();
-                VerticalController_Grounded();
+            //On Airs States//
+            case Player_Main.PlayerDefaultStates.OnAir:
+            case Player_Main.PlayerDefaultStates.OnAir_Falling:
+                Movement_OnAir();
+                VerticalController_OnAir();
                 return;
 
+            //Walk State//
             case Player_Main.PlayerDefaultStates.Walking:
                 Movement_Walk();
                 VerticalController_Grounded();
                 return;
 
+            //Run State//
             case Player_Main.PlayerDefaultStates.Running:
                 Movement_Run();
                 VerticalController_Grounded();
                 return;
 
+            //Crouch State//
+            case Player_Main.PlayerDefaultStates.Sneaking_Walk:
+                Movement_Crouch();
+                VerticalController_Grounded();
+                return;
+
+            //When Idle states, or other unscripted, then Stop speeds//
+            case Player_Main.PlayerDefaultStates.Idle:
+            case Player_Main.PlayerDefaultStates.Sneaking_Idle:
             default:
-                Movement_Idle();
+                Movement_Stop();
                 VerticalController_Grounded();
                 return;
         }
-
     }
 
-    void Movement_Walk()
-    {
-        #region Horizontal
-        if (!isMovingBackward) //When moving forward
-        {
-            desiredHorizontalSpeeds = new Vector2(movementInputVector.x * walkSpeed * sidewaysMovementFactor, movementInputVector.y * walkSpeed);
-        }
-        else //When moving bakward
-        {
-            desiredHorizontalSpeeds = new Vector2(movementInputVector.x * walkSpeed * sidewaysMovementFactor, movementInputVector.y * walkSpeed * backwardMovementFactor);
-        }
-
-        horizontalMoveVector = Vector2.Lerp(horizontalMoveVector, desiredHorizontalSpeeds, walkAccelerationSpeed * Time.deltaTime);
-        #endregion Horizontal
-    }
-
-    void Movement_Run()
-    {
-        #region Horizontal
-        if (!isMovingBackward) //When moving forward
-        {
-            desiredHorizontalSpeeds = new Vector2(movementInputVector.x * runSpeed * sidewaysMovementFactor, movementInputVector.y * runSpeed);
-
-        }
-        else //When moving bakward
-        {
-            desiredHorizontalSpeeds = new Vector2(movementInputVector.x * runSpeed * sidewaysMovementFactor, movementInputVector.y * runSpeed * backwardMovementFactor);
-        }
-
-        horizontalMoveVector = Vector2.Lerp(horizontalMoveVector, desiredHorizontalSpeeds, runAccelerationSpeed * Time.deltaTime);
-        #endregion Horizontal
-
-    }
-
-    void Movement_Idle()
+    #region Horizontal Movement Controllers
+    void Movement_Stop()
     {
         #region Axis Stop
 
@@ -198,23 +192,103 @@ public class Player_Movement_Default : MonoBehaviour
         horizontalMoveVector = Vector2.Lerp(horizontalMoveVector, Vector3.zero, stopAccelerationSpeed * Time.deltaTime);
     }
 
+    void Movement_Walk()
+    {
 
+        if (!isMovingBackward) //When moving forward
+        {
+            desiredHorizontalSpeeds = new Vector2(movementInputVector.x * walkSpeed * sidewaysMovementFactor, movementInputVector.y * walkSpeed);
+        }
+        else //When moving bakward
+        {
+            desiredHorizontalSpeeds = new Vector2(movementInputVector.x * walkSpeed * sidewaysMovementFactor, movementInputVector.y * walkSpeed * backwardMovementFactor);
+        }
+
+        horizontalMoveVector = Vector2.Lerp(horizontalMoveVector, desiredHorizontalSpeeds, walkAccelerationSpeed * Time.deltaTime);
+    }
+
+    void Movement_Run()
+    {
+        if (!isMovingBackward) //When moving forward
+        {
+            desiredHorizontalSpeeds = new Vector2(movementInputVector.x * runSpeed * sidewaysMovementFactor, movementInputVector.y * runSpeed);
+
+        }
+        else //When moving bakward
+        {
+            desiredHorizontalSpeeds = new Vector2(movementInputVector.x * runSpeed * sidewaysMovementFactor, movementInputVector.y * runSpeed * backwardMovementFactor);
+        }
+
+        horizontalMoveVector = Vector2.Lerp(horizontalMoveVector, desiredHorizontalSpeeds, runAccelerationSpeed * Time.deltaTime);
+    }
+
+    void Movement_Crouch()
+    {
+        if (!isMovingBackward) //When moving forward
+        {
+            desiredHorizontalSpeeds = new Vector2(movementInputVector.x * crouchSpeed * sidewaysMovementFactor, movementInputVector.y * crouchSpeed);
+
+        }
+        else //When moving bakward
+        {
+            desiredHorizontalSpeeds = new Vector2(movementInputVector.x * crouchSpeed * sidewaysMovementFactor, movementInputVector.y * crouchSpeed * backwardMovementFactor);
+        }
+
+        horizontalMoveVector = Vector2.Lerp(horizontalMoveVector, desiredHorizontalSpeeds, crouchAccelerationSpeed * Time.deltaTime);
+    }
+
+    void Movement_OnAir()
+    {
+        if (!isMovingBackward) //When moving forward
+        {
+            desiredHorizontalSpeeds = new Vector2(movementInputVector.x * onAirSpeed * sidewaysMovementFactor, movementInputVector.y * onAirSpeed);
+        }
+        else //When moving bakward
+        {
+            desiredHorizontalSpeeds = new Vector2(movementInputVector.x * onAirSpeed * sidewaysMovementFactor, movementInputVector.y * onAirSpeed * backwardMovementFactor);
+        }
+
+        horizontalMoveVector = Vector2.Lerp(horizontalMoveVector, desiredHorizontalSpeeds, onAirAccelerationSpeed * Time.deltaTime);
+    }
+
+    #endregion Horizontal Movement Controllers
+
+    #region Vertical Movement Controllers
     void VerticalController_Grounded()
     {
-        verticalVelocity = -10f;
+        #region Landing
+        if (isLandedOnGround == false)
+        {
+            Debug.Log("Landed On Ground with force of: " + verticalVelocity);
+
+            isLandedOnGround = true;
+        }
+        #endregion Landing
+
+
+        verticalVelocity = Mathf.Lerp(verticalVelocity, -onGroundVerticalForce, groundingSpeed * Time.deltaTime);
     }
 
-    void DesiredSpeedOptimization()
+    void VerticalController_OnAir()
     {
+        #region Landing
+        if (isLandedOnGround == true)
+        {
+            isLandedOnGround = false;
+            verticalVelocity = -2f;
+        }
+        #endregion Landing
 
+        verticalVelocity += Physics.gravity.y * fallingSpeed * Time.deltaTime;
     }
+
+    #endregion Vertical Movement Controllers
 
     #endregion Movement Functions
 
     #region Stopping Functions
 
-
-    void SingleAxis_Stopping()
+    void SingleAxis_Stopping() //Stopping on single axis//
     {
         if (!isAxisInput_X)
         {
@@ -244,13 +318,10 @@ public class Player_Movement_Default : MonoBehaviour
     #endregion Stopping functions
 
     #region Execute Movement Functions
-    void MovementCalculationOptimization()
-    {
-
-    }
-
+    //Movement Execution Controller by condition//
     void MovementExecutionController()
     {
+
         if (player_Main.playerIsSliding)
         {
             MovementExecution_Sliding();
@@ -265,11 +336,13 @@ public class Player_Movement_Default : MonoBehaviour
 
     void MovementExecution_Sliding()
     {
+        Vector3 inputValue = new Vector3(movementInputVector.x, 0, movementInputVector.y);
+
         Vector3 slideHitVector = player_GroundChecks.slopeHit.normal;
         moveVector = new Vector3(slideHitVector.x, -slideHitVector.y, slideHitVector.z);
         Vector3.OrthoNormalize(ref slideHitVector, ref moveVector);
         moveVector *= slideSpeed;
-        playerController.Move(moveVector * Time.deltaTime);
+        playerController.Move((transform.rotation * inputValue + moveVector) * Time.deltaTime);
     }
 
     void MovementExecution_Default()

@@ -6,10 +6,11 @@ public class Player_StateController : MonoBehaviour
 {
     #region Assignments
     Player_Main player_Main; //Player Main Script//
-
+    Player_Movement_Default player_Movement_Default;
     void Awake()
     {
         player_Main = GetComponent<Player_Main>();
+        player_Movement_Default = GetComponent<Player_Movement_Default>();
     }
     #endregion Assignments
 
@@ -35,7 +36,7 @@ public class Player_StateController : MonoBehaviour
     #region Default State
     void DefaultStateController()
     {
-        if (!player_Main.playerIsGrounded) //All states that need tobe done when playeer is on air//
+        if (!player_Main.playerIsGrounded) //All states that need tobe done when player is on air//
         {
             DefaultState_OnAirStates();
         }
@@ -52,14 +53,25 @@ public class Player_StateController : MonoBehaviour
 
     void DefaultState_OnAirStates() //All states that required to be on air//
     {
-        player_Main.playerDefaultState = Player_Main.PlayerDefaultStates.OnAir;
+        if (player_Movement_Default.verticalVelocity >= 0)
+        {
+            player_Main.playerDefaultState = Player_Main.PlayerDefaultStates.OnAir;
+        }
+        else if (player_Movement_Default.verticalVelocity < 0)
+        {
+            player_Main.playerDefaultState = Player_Main.PlayerDefaultStates.OnAir_Falling;
+        }
+        else
+        {
+            Debug.LogWarning("Something broken which on air states!!!");
+        }
     }
 
     void DefaultState_OnGroundStates() //All states that happens on the ground//
     {
-        if(player_Main.playerIsCrouching) //When player is crouching//
+        if (player_Main.playerIsCrouching) //When player is crouching//
         {
-            if(player_Main.playerInputsMovement) //If player Inputs movement buttons
+            if (player_Main.playerInputsMovement) //If player Inputs movement buttons
             {
                 player_Main.playerDefaultState = Player_Main.PlayerDefaultStates.Sneaking_Walk;
             }
@@ -68,11 +80,11 @@ public class Player_StateController : MonoBehaviour
                 player_Main.playerDefaultState = Player_Main.PlayerDefaultStates.Sneaking_Idle;
             }
         }
-        else if(!player_Main.playerIsCrouching) //When player is not moving//
+        else if (!player_Main.playerIsCrouching) //When player is not moving//
         {
             if (player_Main.playerInputsMovement) //If player Inputs movement buttons
             {
-                if(player_Main.playerIsRunning) //If player Running then run
+                if (player_Main.playerIsRunning) //If player Running then run
                 {
                     player_Main.playerDefaultState = Player_Main.PlayerDefaultStates.Running;
                 }

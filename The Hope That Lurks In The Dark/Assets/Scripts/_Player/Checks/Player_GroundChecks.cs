@@ -123,10 +123,6 @@ public class Player_GroundChecks : MonoBehaviour
 
     void SlopeCheck()
     {
-        if (true)
-        {
-
-        }
 
         if (Physics.Raycast(groundCheck_Origin.position, Vector3.down, out slopeHit, slopeRay_Lenght, groundLayers)) //Cast ray//
         {
@@ -203,62 +199,6 @@ public class Player_GroundChecks : MonoBehaviour
                 slopeRaycastHitSphere_Distance = slopeSphere_Lenght;
             }
         }
-
-        /*
-
-                if (playerIsGrounded)
-                {
-                    #region Check if On Slope
-                    //Checking if ground normals, for slope check//
-                    if (Physics.SphereCast(groundCheck_Origin.position, slopeSphereA_Radius, Vector3.down, out slopeHit,  slopeSphereA_Lenght, groundLayers) && Physics.Raycast(groundCheck_Origin.position, Vector3.down, out slopeHit, slopeRayA_Lenght, groundLayers)) //Small sphere, and ray//
-                    {              
-                        if (Vector3.Angle(slopeHit.normal, Vector3.up) > maxSlopeAngle)
-                        {
-                            playerIsOnSlope = true;
-                        }
-                        else
-                        {
-                            playerIsOnSlope = false;
-                        }
-
-                        //Gizmos
-                        slopeRaycastHit_Distance = slopeHit.distance;
-                    }
-                    else //Bigger Sphere when small don't hit anything
-                    {
-                        slopeRaycastHit_Distance = slopeSphereA_Lenght;
-
-                        if (Physics.SphereCast(groundCheck_Origin.position, slopeSphereB_Radius, Vector3.down, out slopeHit, slopeSphereB_Lenght, groundLayers))
-                        {
-                            if (Vector3.Angle(slopeHit.normal, Vector3.up) > maxSlopeAngle)
-                            {
-                                playerIsOnSlope = true;
-                            }
-                            else
-                            {
-                                playerIsOnSlope = false;
-                            }
-
-                            //Gizmos
-                            slopeRaycastHitSphere_Distance = slopeHit.distance;
-                        }
-                        else //If nothing
-                        {
-                            playerIsOnSlope = false;
-
-                            //Gizmos
-                            slopeRaycastHitSphere_Distance = slopeSphereB_Lenght;
-                        }
-                    }
-                    #endregion Check if On Slope
-
-
-                }
-                else //When player is on air, then cannot be on slope//
-                {
-                    playerIsOnSlope = false;
-                }
-            */
 
         //State Update//
         player_Main.playerIsOnSteepSlope = playerIsOnSlope;
