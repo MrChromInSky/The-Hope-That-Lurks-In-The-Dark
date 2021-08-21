@@ -69,7 +69,7 @@ public class Player_StateController : MonoBehaviour
 
     void DefaultState_OnGroundStates() //All states that happens on the ground//
     {
-        if (player_Main.playerIsCrouching) //When player is crouching//
+        if (player_Main.playerIsCrouching && player_Main.canCrouch) //When player is crouching//
         {
             if (player_Main.playerInputsMovement) //If player Inputs movement buttons
             {
@@ -82,9 +82,13 @@ public class Player_StateController : MonoBehaviour
         }
         else if (!player_Main.playerIsCrouching) //When player is not moving//
         {
-            if (player_Main.playerInputsMovement) //If player Inputs movement buttons
+            if(player_Main.playerWillToJump && player_Main.canJump) //Jump State//
             {
-                if (player_Main.playerIsRunning) //If player Running then run
+                player_Main.playerDefaultState = Player_Main.PlayerDefaultStates.Jumping;
+            }
+            else if (player_Main.playerInputsMovement && player_Main.canWalk) //If player Inputs movement buttons
+            {
+                if (player_Main.playerIsRunning && player_Main.canRun) //If player Running then run
                 {
                     player_Main.playerDefaultState = Player_Main.PlayerDefaultStates.Running;
                 }

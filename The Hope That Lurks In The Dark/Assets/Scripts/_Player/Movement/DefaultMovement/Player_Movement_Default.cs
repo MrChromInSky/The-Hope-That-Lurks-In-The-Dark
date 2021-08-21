@@ -27,6 +27,9 @@ public class Player_Movement_Default : MonoBehaviour
 
         //Crouch//
         gameControls.Player.Crouch.performed += ctx => InputController_Crouch();
+
+        //Jump//
+        gameControls.Player.Jump.performed += ctx => InputController_Jump();
         #endregion Input Actions
     }
     #endregion Assignments
@@ -52,6 +55,9 @@ public class Player_Movement_Default : MonoBehaviour
     [Header("Sneaking")]
     [SerializeField] float crouchSpeed;
     [SerializeField] float crouchAccelerationSpeed;
+
+    [Header("Jumping")]
+    [SerializeField] bool isPossibleToJump;
 
     [Header("On Air")]
     [SerializeField] float onAirSpeed;
@@ -129,6 +135,10 @@ public class Player_Movement_Default : MonoBehaviour
         //State Execution Controller//
         switch (player_Main.playerDefaultState)
         {
+            case Player_Main.PlayerDefaultStates.Jumping:
+                JumpController_Execution();
+                return;
+
             //On Airs States//
             case Player_Main.PlayerDefaultStates.OnAir:
             case Player_Main.PlayerDefaultStates.OnAir_Falling:
@@ -259,7 +269,7 @@ public class Player_Movement_Default : MonoBehaviour
         #region Landing
         if (isLandedOnGround == false)
         {
-            Debug.Log("Landed On Ground with force of: " + verticalVelocity);
+            Debug.Log("Landed On Ground with force of: " + verticalVelocity + ", In Velocity:" + playerController.velocity.y);
 
             isLandedOnGround = true;
         }
@@ -275,14 +285,21 @@ public class Player_Movement_Default : MonoBehaviour
         if (isLandedOnGround == true)
         {
             isLandedOnGround = false;
-            verticalVelocity = -2f;
         }
         #endregion Landing
 
         verticalVelocity += Physics.gravity.y * fallingSpeed * Time.deltaTime;
     }
-
     #endregion Vertical Movement Controllers
+
+    #region Jump Controller
+    void JumpController_Execution()
+    {
+        Debug.Log("This is jum[p");
+
+    }
+
+    #endregion Jump Controller
 
     #endregion Movement Functions
 
@@ -436,8 +453,14 @@ public class Player_Movement_Default : MonoBehaviour
         }
         else
         {
+            Debug.Log("Something wrong with InputController_Crouch");
             player_Main.playerIsCrouching = false;
         }
+    }
+
+    void InputController_Jump() //Jump Input Controller
+    {
+
     }
 
     #endregion Input Functions
