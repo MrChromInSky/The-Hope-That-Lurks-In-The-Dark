@@ -73,7 +73,14 @@ public class Player_StateController : MonoBehaviour
         {
             if (player_Main.playerInputsMovement) //If player Inputs movement buttons
             {
-                player_Main.playerDefaultState = Player_Main.PlayerDefaultStates.Sneaking_Walk;
+                if (player_Main.playerIsRunning)
+                {
+                    player_Movement_Default.CrouchToRun(); //If player starts to run from crouching, then stand up, and start running//
+                }
+                else
+                {
+                    player_Main.playerDefaultState = Player_Main.PlayerDefaultStates.Sneaking_Walk;
+                }
             }
             else
             {
@@ -82,11 +89,12 @@ public class Player_StateController : MonoBehaviour
         }
         else if (!player_Main.playerIsCrouching) //When player is not moving//
         {
-            if(player_Main.playerWillToJump && player_Main.canJump) //Jump State//
-            {
-                player_Main.playerDefaultState = Player_Main.PlayerDefaultStates.Jumping;
-            }
-            else if (player_Main.playerInputsMovement && player_Main.canWalk) //If player Inputs movement buttons
+            /*  if(player_Main.playerWillToJump && player_Main.canJump) //Jump State//
+              {
+                  player_Main.playerDefaultState = Player_Main.PlayerDefaultStates.Jumping;
+              }
+              else */
+            if (player_Main.playerInputsMovement && player_Main.canWalk) //If player Inputs movement buttons
             {
                 if (player_Main.playerIsRunning && player_Main.canRun) //If player Running then run
                 {
@@ -111,4 +119,5 @@ public class Player_StateController : MonoBehaviour
     }
 
     #endregion Default State
+
 }

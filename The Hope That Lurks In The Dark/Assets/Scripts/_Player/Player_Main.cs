@@ -57,7 +57,6 @@ public class Player_Main : MonoBehaviour
     [Space]
     public bool playerIsSliding; //If player is on slope that is too steep//
     [Space]
-    public bool playerWillToJump; //If player will to jump//
     public bool playerHitsCeiling; //If player Hits Celling//
     #endregion Default Movement Cases
 

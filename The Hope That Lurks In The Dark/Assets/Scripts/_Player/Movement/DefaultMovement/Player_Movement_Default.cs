@@ -29,7 +29,7 @@ public class Player_Movement_Default : MonoBehaviour
         gameControls.Player.Crouch.performed += ctx => InputController_Crouch();
 
         //Jump//
-        gameControls.Player.Jump.performed += ctx => InputController_Jump();
+        // gameControls.Player.Jump.performed += ctx => InputController_Jump();
         #endregion Input Actions
     }
     #endregion Assignments
@@ -58,6 +58,9 @@ public class Player_Movement_Default : MonoBehaviour
 
     [Header("Jumping")]
     [SerializeField] bool isPossibleToJump;
+    [SerializeField] float jumpVelocity;
+    [SerializeField] float cooldownBetweenJumps;
+    [SerializeField] bool jumpCooldownIsDone;
 
     [Header("On Air")]
     [SerializeField] float onAirSpeed;
@@ -77,6 +80,10 @@ public class Player_Movement_Default : MonoBehaviour
 
     [Header("Player Speed")]
     public float DEBUG_Player_Speed;
+
+    [Header("Tests")]
+    [SerializeField] Vector2 horizontalSpeeds;
+    public float smoothTime;
 
     #endregion Speeds and Accelerations
 
@@ -119,6 +126,7 @@ public class Player_Movement_Default : MonoBehaviour
             return;
         }
 
+
         #region Crouch Disabler
         if (!player_Main.canCrouch) //If player cannot crouch, then resets state
         {
@@ -127,22 +135,41 @@ public class Player_Movement_Default : MonoBehaviour
         #endregion Crouch Disabler
     }
 
+
+    /*  void TEST()
+      {
+          horizontalSpeeds = new Vector2(moveVector.x, moveVector.z);
+
+          if (!isMovingBackward) //When moving forward
+          {
+              desiredHorizontalSpeeds = new Vector2(movementInputVector.x * walkSpeed * sidewaysMovementFactor, movementInputVector.y * walkSpeed);
+          }
+          else //When moving bakward
+          {
+              desiredHorizontalSpeeds = new Vector2(movementInputVector.x * walkSpeed * sidewaysMovementFactor, movementInputVector.y * walkSpeed * backwardMovementFactor);
+          }
+
+          horizontalMoveVector = Vector2.SmoothDamp(horizontalMoveVector, desiredHorizontalSpeeds, ref horizontalSpeeds, smoothTime);
+
+      }*/
+
     #region Movement Functions
     void MovementController()
     {
         DEBUG_Player_Speed = playerController.velocity.magnitude; //Debug player speed//
 
+
         //State Execution Controller//
         switch (player_Main.playerDefaultState)
         {
             case Player_Main.PlayerDefaultStates.Jumping:
-                JumpController_Execution();
+                // JumpController();
                 return;
 
             //On Airs States//
             case Player_Main.PlayerDefaultStates.OnAir:
             case Player_Main.PlayerDefaultStates.OnAir_Falling:
-                Movement_OnAir();
+                //  Movement_OnAir();
                 VerticalController_OnAir();
                 return;
 
@@ -160,7 +187,7 @@ public class Player_Movement_Default : MonoBehaviour
 
             //Crouch State//
             case Player_Main.PlayerDefaultStates.Sneaking_Walk:
-                Movement_Crouch();
+                // Movement_Crouch();
                 VerticalController_Grounded();
                 return;
 
@@ -172,6 +199,8 @@ public class Player_Movement_Default : MonoBehaviour
                 VerticalController_Grounded();
                 return;
         }
+
+        // TEST();
     }
 
     #region Horizontal Movement Controllers
@@ -215,6 +244,8 @@ public class Player_Movement_Default : MonoBehaviour
         }
 
         horizontalMoveVector = Vector2.Lerp(horizontalMoveVector, desiredHorizontalSpeeds, walkAccelerationSpeed * Time.deltaTime);
+
+        // horizontalMoveVector = Vector2.SmoothDamp(horizontalMoveVector, desiredHorizontalSpeeds, ref horizontalMoveVector, walkAccelerationSpeed);
     }
 
     void Movement_Run()
@@ -230,6 +261,7 @@ public class Player_Movement_Default : MonoBehaviour
         }
 
         horizontalMoveVector = Vector2.Lerp(horizontalMoveVector, desiredHorizontalSpeeds, runAccelerationSpeed * Time.deltaTime);
+        //horizontalMoveVector = Vector2.SmoothDamp(horizontalMoveVector, desiredHorizontalSpeeds, ref horizontalMoveVector, runAccelerationSpeed);
     }
 
     void Movement_Crouch()
@@ -266,14 +298,11 @@ public class Player_Movement_Default : MonoBehaviour
     #region Vertical Movement Controllers
     void VerticalController_Grounded()
     {
-        #region Landing
-        if (isLandedOnGround == false)
+        if (!isLandedOnGround)
         {
-            Debug.Log("Landed On Ground with force of: " + verticalVelocity + ", In Velocity:" + playerController.velocity.y);
-
             isLandedOnGround = true;
+            Debug.Log("Landed, with velocity of: " + playerController.velocity.y);
         }
-        #endregion Landing
 
 
         verticalVelocity = Mathf.Lerp(verticalVelocity, -onGroundVerticalForce, groundingSpeed * Time.deltaTime);
@@ -281,25 +310,24 @@ public class Player_Movement_Default : MonoBehaviour
 
     void VerticalController_OnAir()
     {
-        #region Landing
-        if (isLandedOnGround == true)
+        if (isLandedOnGround)
         {
             isLandedOnGround = false;
         }
-        #endregion Landing
 
         verticalVelocity += Physics.gravity.y * fallingSpeed * Time.deltaTime;
+
     }
+
     #endregion Vertical Movement Controllers
 
-    #region Jump Controller
-    void JumpController_Execution()
+    #region Jump
+    void JumpController()
     {
-        Debug.Log("This is jum[p");
-
+        verticalVelocity = jumpVelocity;
     }
 
-    #endregion Jump Controller
+    #endregion Jump
 
     #endregion Movement Functions
 
@@ -376,7 +404,7 @@ public class Player_Movement_Default : MonoBehaviour
     #endregion Execute Movement Functions
 
     #region Input Functions
-    void InputController_Movement()
+    void InputController_Movement() //Basic movmenent input Functions (WSAD)//
     {
         movementInputVector = gameControls.Player.Movement.ReadValue<Vector2>(); //Checks value of inputs//
 
@@ -458,11 +486,6 @@ public class Player_Movement_Default : MonoBehaviour
         }
     }
 
-    void InputController_Jump() //Jump Input Controller
-    {
-
-    }
-
     #endregion Input Functions
 
     #region Check Functions
@@ -478,6 +501,14 @@ public class Player_Movement_Default : MonoBehaviour
         }
     }
     #endregion Check Functions
+
+    #region Special Functions
+    public void CrouchToRun()
+    {
+        player_Main.playerIsCrouching = false;
+    }
+
+    #endregion Special Functions
 
     #region OnEnable, On Disable
     void OnEnable()
