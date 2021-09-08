@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.01.00">
+	<object class="AudioFile" id="{e6832192-52d8-4aab-a42a-dd91de6a946a}">
+		<property name="assetPath">
+			<value>Music/Easter Eggs/Kumbejj [slow].mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>319.00734693877553</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{e263c8ee-1add-411b-9b58-87f3ad56b65d}</destination>
+		</relationship>
+	</object>
+</objects>

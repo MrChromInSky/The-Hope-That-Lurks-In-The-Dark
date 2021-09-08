@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.01.00">
+	<object class="EventFolder" id="{785898f5-75f4-4f00-bd07-daf8f62ff550}">
+		<property name="name">
+			<value>Tiffany3D</value>
+		</property>
+		<relationship name="folder">
+			<destination>{a4135b6b-c189-44b1-a863-dc936615b780}</destination>
+		</relationship>
+	</object>
+</objects>
